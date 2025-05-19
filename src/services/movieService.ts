@@ -5,7 +5,7 @@ const API_KEY = import.meta.env.VITE_TMDB_TOKEN;
 
 interface FetchMoviesProps {
   query: string;
-  page?: number;
+  currentPage: number;
 }
 
 interface MoviesHttpResponse {
@@ -16,10 +16,10 @@ interface MoviesHttpResponse {
 
 export async function fetchMovies({
   query,
-  page = 1,
+  currentPage,
 }: FetchMoviesProps): Promise<MoviesHttpResponse> {
   const response = await axios.get<MoviesHttpResponse>(
-    `https://api.themoviedb.org/3/search/movie?query=${query}&include_adult=false&language=en-US&page=${page}`,
+    `https://api.themoviedb.org/3/search/movie?query=${query}&include_adult=false&language=en-US&page=${currentPage}`,
     {
       headers: {
         Authorization: `Bearer ${API_KEY}`,
