@@ -16,34 +16,28 @@ import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import ReactPaginate from "react-paginate";
 
 export default function App() {
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
   const { data, isLoading, isError, isSuccess } = useQuery({
-    queryKey: ["movies", query, currentPage],
-    queryFn: () => fetchMovies({ query, currentPage }),
+    queryKey: ["movies", query, page],
+    queryFn: () => fetchMovies({ query, page }),
     enabled: query !== "",
     placeholderData: keepPreviousData,
   });
+  const totalPages = data?.total_pages ?? 0;
 
   useEffect(() => {
-    if (data && data.results) {
-      setMovies(data.results);
-      if (data.results.length == 0) {
-        toast.error("No movies found for your request.");
-      }
+    if (isSuccess && data.results.length == 0) {
+      toast.error("No movies found for your request.");
     }
-  }, [data]);
-
-  const totalPages = data?.total_pages ?? 0;
+  }, [data, isSuccess]);
 
   const closeModal = () => setSelectedMovie(null);
   const handleSelectMovie = (movie: Movie) => setSelectedMovie(movie);
-
   const handleSearch = async (query: string) => {
     setQuery(query);
-    setCurrentPage(1);
+    setPage(1);
   };
 
   return (
@@ -55,8 +49,8 @@ export default function App() {
           pageCount={totalPages}
           pageRangeDisplayed={5}
           marginPagesDisplayed={1}
-          onPageChange={({ selected }) => setCurrentPage(selected + 1)}
-          forcePage={currentPage - 1}
+          onPageChange={({ selected }) => setPage(selected + 1)}
+          forcePage={page - 1}
           containerClassName={css.pagination}
           activeClassName={css.active}
           disabledClassName={css.disabled}
@@ -64,8 +58,8 @@ export default function App() {
           previousLabel={<MdOutlineKeyboardArrowLeft size={24} />}
         />
       )}
-      {movies.length > 0 && (
-        <MovieGrid movies={movies} onSelect={handleSelectMovie} />
+      {isSuccess && (
+        <MovieGrid movies={data?.results} onSelect={handleSelectMovie} />
       )}
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}

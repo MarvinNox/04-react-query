@@ -3,7 +3,7 @@ import css from "./MovieGrid.module.css";
 
 interface MovieGridProps {
   onSelect: (movie: Movie) => void;
-  movies: Movie[];
+  movies: Movie[] | undefined;
 }
 
 const placeholderImg: string =
@@ -12,7 +12,7 @@ const placeholderImg: string =
 export default function MovieGrid({ onSelect, movies }: MovieGridProps) {
   return (
     <ul className={css.grid}>
-      {movies.map((movie) => {
+      {movies?.map((movie) => {
         return (
           <li key={movie.id}>
             <div onClick={() => onSelect(movie)} className={css.card}>
